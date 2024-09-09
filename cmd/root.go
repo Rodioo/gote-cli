@@ -8,12 +8,12 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "gote",
+	Version: "v1.0.0",
 	Short: "Gote is a note taking CLI tool",
-	Long: `Gote is a note taking CLI tool 
-			which allows you to quickly create, read, edit or delete your notes directly from the terminal`,
-	Run: func(cmd *cobra.Command, args []string) {
-		// Do Stuff Here
-	},
+}
+
+func init() {
+	rootCmd.SetVersionTemplate("Gote - {{.Version}}\n")
 }
 
 func Execute() {
