@@ -2,14 +2,15 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"os"
+
+	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "gote",
+	Use:     "gote",
 	Version: "v1.0.0",
-	Short: "Gote is a note taking CLI tool",
+	Short:   "Gote is a note taking CLI tool",
 }
 
 func init() {
