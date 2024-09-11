@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/antoniofalcescu/gote-cli/utils"
@@ -9,13 +8,15 @@ import (
 )
 
 func handleAddCmd(cmd *cobra.Command, args []string) {
-	path, err := utils.GetPathByOs()
+	dirPath, err := utils.GetStorageDirPath()
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(path)
+	if err := utils.CreateDirIfNotExists(dirPath); err != nil {
+		log.Fatal(err)
+	}
 }
 
 var addCmd = &cobra.Command{
