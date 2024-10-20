@@ -18,7 +18,6 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	osImpl = Os{}
-
 	rootCmd.SetVersionTemplate("Gote - {{.Version}}\n")
 }
 
