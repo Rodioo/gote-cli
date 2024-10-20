@@ -1,44 +1,79 @@
 package utils
 
 import (
-	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"path"
 	"runtime"
+
+	"github.com/antoniofalcescu/gote-cli/types"
 )
 
-const APP_NAME = "Gote"
-
-func GetStorageDirPath() (dirPath string, err error) {
-	homeDir, err := os.UserHomeDir()
+func GetStorageDirPath(osProvider types.OsProvider) (dirPath string, err error) {
+	homeDir, err := osProvider.GetHomeDir()
 	if err != nil {
 		return dirPath, err
 	}
 
-	switch os := runtime.GOOS; os {
+	switch os := osProvider.GetOs(); os {
 	case "darwin":
-		dirPath = path.Join(homeDir, "Library", "Application Support", APP_NAME)
+		dirPath = path.Join(homeDir, "Library", "Application Support", AppName)
 	case "linux":
-		dirPath = path.Join(homeDir, APP_NAME)
+		dirPath = path.Join(homeDir, AppName)
 	case "windows":
-		dirPath = path.Join(homeDir, fmt.Sprintf(".%s", APP_NAME))
+		dirPath = path.Join(homeDir, fmt.Sprintf(".%s", AppName))
 	default:
-		err = errors.New("unsupported platform, please open a github issue")
+		err = fmt.Errorf("unsupported platform: %s, please open a github issue", os)
 	}
 
 	return dirPath, err
 }
 
-func CreateDirIfNotExists(dirPath string) (err error) {
+func CreateDirIfNotExists(dirPath string) error {
+
 	if _, err := os.Stat(dirPath); !os.IsNotExist(err) {
 		return nil
 	}
 
-	if err := os.Mkdir(dirPath, os.ModePerm); err != nil {
+	if err := os.MkdirAll(dirPath, os.ModePerm); err != nil {
 		return err
 	}
 
-	fmt.Printf("finished first time initialization, your notes will be saved in %s\n", dirPath)
+	return nil
+}
+
+var clear map[string]func()
+
+func init() {
+	clear = make(map[string]func())
+	clear["linux"] = func() {
+		cmd := exec.Command("clear")
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
+	clear["windows"] = func() {
+		cmd := exec.Command("cmd", "/c", "cls")
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
+}
+
+func Clear() error {
+	var clearCmd *exec.Cmd
+
+	switch os := runtime.GOOS; os {
+	case "darwin":
+		clearCmd = exec.Command("clear")
+	case "linux":
+		clearCmd = exec.Command("clear")
+	case "windows":
+		clearCmd = exec.Command("cmd", "/c", "cls")
+	default:
+		return fmt.Errorf("unsupported platform: %s, please open a github issue", os)
+	}
+
+	clearCmd.Stdout = os.Stdout
+	clearCmd.Run()
 	return nil
 }
